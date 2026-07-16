@@ -25,10 +25,11 @@ export class ItemsService {
 
   async update(id: string, updateItemInput: UpdateItemInput): Promise<Item> {
     const item  = await this.findOne(id)
-    return this.itemsRepository.save({...updateItemInput,...item});
+    return this.itemsRepository.save({...item,...updateItemInput});
   }
 
-  remove(id: string) {
-    return this.itemsRepository.softRemove({id});
+  async remove(id: string): Promise<Item> {
+    const item = await this.findOne(id)
+    return this.itemsRepository.remove(item);
   }
 }
