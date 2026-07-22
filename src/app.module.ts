@@ -8,6 +8,7 @@ import {ApolloServerPluginLandingPageLocalDefault} from "@apollo/server/plugin/l
 import {ItemsModule} from './items/items.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { CoreModule } from './core/core.module';
 
 
 
@@ -37,6 +38,7 @@ import { AuthModule } from './auth/auth.module';
     ItemsModule,
     UsersModule,
     AuthModule,
+    CoreModule,
   ],
   controllers: [],
   providers: [],
