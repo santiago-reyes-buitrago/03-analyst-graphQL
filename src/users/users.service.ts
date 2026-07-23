@@ -19,7 +19,6 @@ export class UsersService {
     try {
       return await this.userRepository.save(this.userRepository.create({...signUpInput,password: bcrypt.hashSync(signUpInput.password,10)}));
     } catch (err) {
-      console.log(err);
       this.handleErrors.handleError(err)
       throw new BadRequestException('Algo salio mal')
     }
@@ -29,8 +28,17 @@ export class UsersService {
     return this.userRepository.find({where: {status: true}});
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+
+  }
+
+  async findOneByEmail(email: string) {
+    try {
+      return this.userRepository.findOneByOrFail({email})
+    }catch (error ){
+      this.handleErrors.handleError(error)
+    }
+
   }
 
   update(id: string, updateUserInput: UpdateUserInput) {
