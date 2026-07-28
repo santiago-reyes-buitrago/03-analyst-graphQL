@@ -19,7 +19,8 @@ export class HandleErrors {
   }
 
 
-  handleError({code, detail}: paramErrors<any>) {
+  handleError({code, detail,...rest}: paramErrors<any>) {
+    console.log(rest)
     if (!this.errors[code]) throw new InternalServerErrorException('Error unknown')
     this.logger.error(`Code: ${code} - Message: ${detail}`)
     this.errors[code](detail)

@@ -34,7 +34,7 @@ export class UsersService {
 
   async findOneByEmail(email: string) {
     try {
-      return this.userRepository.findOneByOrFail({email})
+      return await this.userRepository.findOneByOrFail({email})
     }catch (error ){
       this.handleErrors.handleError(error)
     }
