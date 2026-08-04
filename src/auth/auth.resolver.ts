@@ -3,6 +3,8 @@ import { AuthService } from './auth.service';
 import {SignupInput} from "./dto/inputs/signup.input";
 import {AuthResponseType} from "./types/auth-response.type";
 import {LoginInput} from "./dto/inputs/login.input";
+import {UseGuards} from "@nestjs/common";
+import {JwtAuthGuard} from "./guards/jwt-auth.guard";
 
 @Resolver()
 export class AuthResolver {
@@ -18,8 +20,11 @@ export class AuthResolver {
     return this.authService.login(loginInput)
   }
 
-  @Query(() => String, {name: 'revalidate'})
-  revalidateToken() {
-    return this.authService.revalidate()
+
+  @Query(() => AuthResponseType, {name: 'revalidate'})
+  @UseGuards(JwtAuthGuard)
+  revalidateToken(): AuthResponseType {
+    // return this.authService.revalidate()
+    throw new Error('method not implemented')
   }
 }

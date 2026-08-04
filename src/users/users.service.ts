@@ -29,7 +29,11 @@ export class UsersService {
   }
 
   async findOne(id: string) {
-
+    try {
+      return await this.userRepository.findOneByOrFail({id})
+    }catch (error ){
+      this.handleErrors.handleError(error)
+    }
   }
 
   async findOneByEmail(email: string) {
@@ -38,7 +42,6 @@ export class UsersService {
     }catch (error ){
       this.handleErrors.handleError(error)
     }
-
   }
 
   update(id: string, updateUserInput: UpdateUserInput) {
