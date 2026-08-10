@@ -4,6 +4,7 @@ import {PassportStrategy} from "@nestjs/passport";
 import {ExtractJwt, Strategy} from "passport-jwt";
 import {User} from "../../users/entities/user.entity";
 import {UsersService} from "../../users/users.service";
+import {JwtPayloadInterface} from "../interfaces/jwt-payload.interface";
 
 
 @Injectable()
@@ -21,7 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { id: string, iat: number, exp: number }): Promise<User> {
+  async validate(payload: JwtPayloadInterface): Promise<User> {
     try {
       const user = await this.userService.findOne(payload.id)
       if (!user || !user?.status) throw new Error('Usuario no existe o esta inactivo')
