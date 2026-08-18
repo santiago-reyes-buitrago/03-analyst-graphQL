@@ -1,5 +1,5 @@
 import {Args, Mutation, Query, Resolver} from '@nestjs/graphql';
-import { AuthService } from './auth.service';
+import {AuthService} from './auth.service';
 import {SignupInput} from "./dto/inputs/signup.input";
 import {AuthResponseType} from "./types/auth-response.type";
 import {LoginInput} from "./dto/inputs/login.input";
@@ -7,6 +7,7 @@ import {Logger, UseGuards} from "@nestjs/common";
 import {JwtAuthGuard} from "./guards/jwt-auth.guard";
 import {CurrentUser} from "./decorators/current-user.decorator";
 import {User} from "../users/entities/user.entity";
+import {ValidRoles} from "./enums/valid-roles.enum";
 
 @Resolver()
 export class AuthResolver {
@@ -26,9 +27,8 @@ export class AuthResolver {
 
   @Query(() => AuthResponseType, {name: 'revalidate'})
   @UseGuards(JwtAuthGuard)
-  revalidateToken(@CurrentUser() user: User): AuthResponseType {
-    // return this.authService.revalidate()
-    this.logger.log(user)
-    throw new Error('method not implemented')
+  revalidateToken(@CurrentUser([ValidRoles.USER]) user: User): AuthResponseType {
+    this.logger.log('Revalidate')
+    return this.authService.revalidate(user)
   }
 }

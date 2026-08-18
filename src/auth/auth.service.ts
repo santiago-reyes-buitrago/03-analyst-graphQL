@@ -5,6 +5,7 @@ import {AuthResponseType} from "./types/auth-response.type";
 import {UsersService} from "../users/users.service";
 import {LoginInput} from "./dto/inputs/login.input";
 import {JwtService} from "@nestjs/jwt";
+import {User} from "../users/entities/user.entity";
 
 @Injectable()
 export class AuthService {
@@ -42,7 +43,9 @@ export class AuthService {
     }
   }
 
-  revalidate() {
-    throw new Error('Method not implemented.');
+  revalidate(user: User): AuthResponseType {
+    const token =  this.getJwtToken(user.id)
+    return {token,user}
   }
+
 }
