@@ -6,8 +6,6 @@ import {ValidRoles} from "../enums/valid-roles.enum";
 
 const validateRole = (validateRoles: ValidRoles[] = [],userRoles: string[] = []) => {
   for (const role of userRoles) {
-    console.log(role)
-    console.log(validateRoles)
     if (validateRoles.includes(role as ValidRoles)) return true;
   }
   return false;
