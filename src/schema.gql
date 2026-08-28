@@ -15,6 +15,7 @@ type User {
   email: String!
   roles: [String!]!
   status: Boolean!
+  lastUpdateBy: User
 }
 
 type AuthResponseType {

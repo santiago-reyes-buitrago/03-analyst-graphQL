@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable} from '@nestjs/common';
+import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import {UpdateUserInput} from "./dto/inputs";
 import {User} from "./entities/user.entity";
@@ -18,7 +18,10 @@ export class UsersService {
 
   async create(signUpInput: SignupInput): Promise<User> {
     try {
-      return await this.userRepository.save(this.userRepository.create({...signUpInput,password: bcrypt.hashSync(signUpInput.password,10)}));
+      return await this.userRepository.save(this.userRepository.create({
+        ...signUpInput,
+        password: bcrypt.hashSync(signUpInput.password, 10)
+      }));
     } catch (err) {
       this.handleErrors.handleError(err)
       throw new BadRequestException('Algo salio mal')
@@ -26,10 +29,17 @@ export class UsersService {
   }
 
   async findAll(roles: ValidRoles[] = []): Promise<User[]> {
-    if (roles.length === 0) return this.userRepository.find({where: {status: true}});
+    if (roles.length === 0) return this.userRepository.find(
+        {
+          where: {status: true},
+          relations: {
+            lastUpdateBy: true
+          }
+        });
     return this.userRepository.createQueryBuilder()
-        .andWhere('ARRAY[roles] && ARRAY[:...roles]')
-        .setParameter('roles',roles)
+        .leftJoin('users', 'us', '"User"."lastUpdateBy" = us.id')
+        .andWhere('ARRAY["User".roles] && ARRAY[:...roles]')
+        .setParameter('roles', roles)
         .getMany()
 
   }
@@ -37,7 +47,7 @@ export class UsersService {
   async findOne(id: string) {
     try {
       return await this.userRepository.findOneByOrFail({id})
-    }catch (error ){
+    } catch (error) {
       this.handleErrors.handleError(error)
     }
   }
@@ -45,7 +55,7 @@ export class UsersService {
   async findOneByEmail(email: string) {
     try {
       return await this.userRepository.findOneByOrFail({email})
-    }catch (error ){
+    } catch (error) {
       this.handleErrors.handleError(error)
     }
   }
@@ -54,8 +64,11 @@ export class UsersService {
     return `This action updates a #${id} user`;
   }
 
-  block(id: string): Promise<User> {
-    throw new Error('Method not implemented.');
-    // return ;
+  async block(id: string, user?: User): Promise<User> {
+    const userToBlock = await this.findOne(id);
+    if (!userToBlock) throw new NotFoundException('Usuario no existe')
+    userToBlock.status = false;
+    userToBlock.lastUpdateBy = user;
+    return await this.userRepository.save(userToBlock);
   }
 }

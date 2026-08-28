@@ -1,10 +1,11 @@
-import {Resolver, Query, Mutation, Args, ID} from '@nestjs/graphql';
+import {Args, ID, Mutation, Query, Resolver} from '@nestjs/graphql';
 import {UsersService} from './users.service';
 import {User} from './entities/user.entity';
 import {ValidateRolesArgs} from "./dto/args/roles.arg";
 import {CurrentUser} from "../auth/decorators/current-user.decorator";
 import {ParseUUIDPipe, UseGuards} from "@nestjs/common";
 import {JwtAuthGuard} from "../auth/guards/jwt-auth.guard";
+import {ValidRoles} from "../auth/enums/valid-roles.enum";
 
 @Resolver(() => User)
 @UseGuards(JwtAuthGuard)
@@ -23,7 +24,7 @@ export class UsersResolver {
   }
 
   @Mutation(() => User)
-  blockUser(@Args('id', {type: () => ID},ParseUUIDPipe) id: string): Promise<User> {
-    return this.usersService.block(id);
+  blockUser(@Args('id', {type: () => ID},ParseUUIDPipe) id: string,@CurrentUser([ValidRoles.ADMIN]) user: User): Promise<User> {
+    return this.usersService.block(id,user);
   }
 }
