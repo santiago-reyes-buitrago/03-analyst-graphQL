@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
+import {BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import {UpdateUserInput} from "./dto/inputs";
 import {User} from "./entities/user.entity";
@@ -10,6 +10,7 @@ import {ValidRoles} from "../auth/enums/valid-roles.enum";
 
 @Injectable()
 export class UsersService {
+  logger = new Logger(UsersService.name)
   constructor(
       @InjectRepository(User) private readonly userRepository: Repository<User>,
       private readonly handleErrors: HandleErrors
@@ -60,8 +61,16 @@ export class UsersService {
     }
   }
 
-  update(id: string, updateUserInput: UpdateUserInput) {
-    return `This action updates a #${id} user`;
+  async update(updateUserInput: UpdateUserInput,userLastUpdate: User): Promise<User> {
+    try {
+      const userToUpdate = await this.userRepository.preload(updateUserInput)
+      if (!userToUpdate) throw new NotFoundException('No se encontro este usuario')
+      userToUpdate.lastUpdateBy =  userLastUpdate
+      return await this.userRepository.save({...userToUpdate,password: bcrypt.hashSync(userToUpdate.password, 10)});
+    }catch (e) {
+      this.logger.error(e)
+      throw new InternalServerErrorException('Un error incontrolable')
+    }
   }
 
   async block(id: string, user?: User): Promise<User> {
