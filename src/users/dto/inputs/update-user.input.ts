@@ -9,12 +9,12 @@ export class UpdateUserInput extends PartialType(CreateUserInput) {
   @IsUUID()
   id: string;
 
-  @Field(() => [ValidRoles])
+  @Field(() => [ValidRoles],{nullable: true})
   @IsOptional()
   @IsEnum(ValidRoles,{each: true})
   roles?: ValidRoles[];
 
-  @Field(() => Boolean)
+  @Field(() => Boolean,{nullable: true})
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;

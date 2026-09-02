@@ -25,7 +25,7 @@ export class UsersResolver {
   }
 
   @Mutation(() => User, {name: 'updateUser'})
-  updateUser(@Args('updateUserInput', {type: () => UpdateUserInput}) updateUserInput: UpdateUserInput,@CurrentUser() user: User): Promise<User> {
+  updateUser(@Args('updateUserInput', {type: () => UpdateUserInput}) updateUserInput: UpdateUserInput,@CurrentUser([ValidRoles.ADMIN]) user: User): Promise<User> {
     return this.usersService.update(updateUserInput,user);
   }
 
